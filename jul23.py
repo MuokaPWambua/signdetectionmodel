@@ -7,6 +7,17 @@ from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfigurati
 import av
 from collections import deque
 
+import os
+from twilio.rest import Client
+
+
+account_sid = 'AC454659866340349179741b65b291b7f6'
+auth_token = '700c80be42f2d334fcd204120c51c562'
+
+client = Client(account_sid, auth_token)
+
+token = client.tokens.create()
+print(token)
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 
@@ -76,7 +87,7 @@ class VideoProcessor(VideoProcessorBase):
         )
         self.sentence_queue = deque(maxlen=6)
 
-    async def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
+    def recv(self, frame: av.VideoFrame) -> av.VideoFrame:
         image = frame.to_ndarray(format="bgr24")
 
         image, results = mediapipe_detection(image, self.holistic)
@@ -100,8 +111,11 @@ class VideoProcessor(VideoProcessorBase):
         return av.VideoFrame.from_ndarray(image, format='bgr24')
 
 rtc_configuration = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
+    {
+        "iceServers": token.ice_servers
+    }
 )
+
 
 def main():
     st.title("Real-Time Sign Detection")
