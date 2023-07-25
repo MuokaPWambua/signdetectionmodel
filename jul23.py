@@ -6,18 +6,22 @@ from tensorflow.keras.models import load_model
 from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration
 import av
 from collections import deque
-
-import os
 from twilio.rest import Client
 
+import os
+from dotenv import load_dotenv
 
-account_sid = 'AC454659866340349179741b65b291b7f6'
-auth_token = '700c80be42f2d334fcd204120c51c562'
+# Load environment variables from .env file
+load_dotenv()
+
+# Access environment variables
+account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+auth_token = os.getenv("TWILIO_AUTH_TOKEN")
 
 client = Client(account_sid, auth_token)
 
 token = client.tokens.create()
-print(token)
+
 mp_drawing = mp.solutions.drawing_utils
 mp_holistic = mp.solutions.holistic
 
